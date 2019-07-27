@@ -8,7 +8,6 @@ import java.util.ArrayList;
 public class SearchQueue {
 
     ArrayList<User> users = new ArrayList<>();
-    int matchID =-2;
 
     public void addUser(User user){
         if(!users.contains(user)) {
@@ -17,13 +16,6 @@ public class SearchQueue {
     }
 
     public SearchQueue(){};
-
-    public SearchQueue(SearchQueue queue){
-        this.users.add(queue.getUser(0));
-        this.users.add(queue.getUser(1));
-    }
-
-
 
     public User getUser(int index){
         return users.get(index);

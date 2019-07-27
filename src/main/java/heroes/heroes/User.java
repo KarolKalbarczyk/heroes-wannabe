@@ -1,8 +1,11 @@
 package heroes.heroes;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -11,6 +14,7 @@ import java.util.Set;
 @Entity
 @Data
 @Table(name = "users")
+@EqualsAndHashCode
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -24,7 +28,10 @@ public class User {
     @JsonIgnore
     String roles = "USER";
 
-    public User(String username,String password){
+    public User(){};
+
+    @JsonCreator
+    public User(@JsonProperty("username") String username, String password){
         this.password = password;
         this.username = username;
     }
@@ -33,18 +40,6 @@ public class User {
         return username;
     }
 
-    public User(){};
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof User)) return false;
-        User user = (User) o;
-        return username.equals(user.username);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(username);
-    }
 }

@@ -1,6 +1,9 @@
 package heroes.heroes;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Match {
+    @JsonIgnore
     private SearchQueue queue;
     private User user1;
     private User user2;
