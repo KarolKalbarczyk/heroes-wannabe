@@ -1,4 +1,4 @@
-package heroes.heroes.Entities;
+package heroes.heroes.MatchComponents;
 
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;

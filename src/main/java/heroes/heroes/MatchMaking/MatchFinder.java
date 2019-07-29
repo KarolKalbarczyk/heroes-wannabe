@@ -1,13 +1,12 @@
-package heroes.heroes;
+package heroes.heroes.MatchMaking;
 
 import heroes.heroes.Repositories.UserRepository;
+import heroes.heroes.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,32 +26,31 @@ public class MatchFinder {
     UserRepository repository;
     @Autowired
     MatchCreator creator;
-    int id;
     int NO_MATCH_FOUND = -2;
 
     @GetMapping()
     @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<Integer> find(Principal principal){
-        clearID();
+        //clearID();
         User user = repository.findByUsername(principal.getName()).get();
         queue.addUser(user);
         initilizeMatch();
-        if(queue.matchID == NO_MATCH_FOUND) {
-            return new ResponseEntity<Integer>(id, HttpStatus.EXPECTATION_FAILED);
+        if(queue.matchid == NO_MATCH_FOUND) {
+            return new ResponseEntity<Integer>(queue.matchid, HttpStatus.EXPECTATION_FAILED);
         }
-        return new ResponseEntity<Integer>(id, HttpStatus.OK);
+        return new ResponseEntity<Integer>(queue.matchid, HttpStatus.OK);
     }
 
     public void clearID(){
         if(queue.size()==0){
-            id = NO_MATCH_FOUND;
+            queue.matchid = NO_MATCH_FOUND;
         }
     }
 
     @Transactional
     public void initilizeMatch(){
         if(queue.isFull()){
-            id = creator.startNewMatch(queue);
+            queue.matchid = creator.startNewMatch(queue);
             queue.clean();
         }
     }

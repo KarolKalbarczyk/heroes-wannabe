@@ -1,5 +1,6 @@
-package heroes.heroes;
+package heroes.heroes.MatchMaking;
 
+import heroes.heroes.User;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 public class SearchQueue {
 
     ArrayList<User> users = new ArrayList<>();
+    int matchid = -2;
 
     public void addUser(User user){
         if(!users.contains(user)) {

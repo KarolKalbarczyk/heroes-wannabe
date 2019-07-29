@@ -1,0 +1,3 @@
+[submodule "heroes-front-end"]
+	path = heroes-front-end
+	url = https://github.com/KarolKalbarczyk/heroes-front-end
