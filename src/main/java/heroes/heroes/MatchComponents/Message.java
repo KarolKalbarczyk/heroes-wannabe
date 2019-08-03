@@ -22,13 +22,13 @@ public class Message {
     //@JoinColumn(name = "chat_id")
     @JsonIgnore
     private  final Chat chat;
-    private final String inGameCreationTime;
+    private final long inGameCreationTime;
     private static final int MAX_TEXT_LENGTH = 100;
 
 
     @JsonCreator
     private Message(@JsonProperty("text") String text,@JsonProperty("author") String author,
-                  @JsonProperty("time")  String inGameCreationTime,  Chat chat) {
+                  @JsonProperty("time")  long inGameCreationTime,  Chat chat) {
         this.text = text;
         this.author = author;
         this.chat = chat;
@@ -36,7 +36,7 @@ public class Message {
     }
 
     public static boolean writeMessage(String text, String author,
-                                       Chat chat, String inGameCreationTime){
+                                       Chat chat, long inGameCreationTime){
         if(text.length()> MAX_TEXT_LENGTH ) return false;
         else {
             Message message = new Message(text, author,

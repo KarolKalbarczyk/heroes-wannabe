@@ -14,7 +14,7 @@ import java.util.LinkedList;
 //@Entity
 @Getter
 public class Chat {
-//    @OneToOne
+//  @OneToOne
     @JsonIgnore
     private final Match match;
 

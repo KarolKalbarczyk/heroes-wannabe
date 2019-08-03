@@ -34,11 +34,7 @@ public class MatchFinder {
         //clearID();
         User user = repository.findByUsername(principal.getName()).get();
         queue.addUser(user);
-        initilizeMatch();
-        if(queue.matchid == NO_MATCH_FOUND) {
-            return new ResponseEntity<Integer>(queue.matchid, HttpStatus.EXPECTATION_FAILED);
-        }
-        return new ResponseEntity<Integer>(queue.matchid, HttpStatus.OK);
+        return initilizeMatch();
     }
 
     public void clearID(){
@@ -48,11 +44,15 @@ public class MatchFinder {
     }
 
     @Transactional
-    public void initilizeMatch(){
+    public ResponseEntity<Integer> initilizeMatch(){
         if(queue.isFull()){
             queue.matchid = creator.startNewMatch(queue);
             queue.clean();
         }
+        if(queue.matchid == NO_MATCH_FOUND) {
+            return new ResponseEntity<Integer>(queue.matchid, HttpStatus.EXPECTATION_FAILED);
+        }
+        return new ResponseEntity<Integer>(queue.matchid, HttpStatus.OK);
     }
 
 
