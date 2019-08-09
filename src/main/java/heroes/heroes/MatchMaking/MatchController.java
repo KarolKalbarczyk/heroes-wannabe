@@ -20,6 +20,8 @@ public class MatchController {
     MatchCreator creator;
     @Autowired
     SearchQueue queue;
+    @Autowired
+    UserQueryReceiver receiver;
 
     @GetMapping("/match/{id}")
     public Match startMatch(@PathVariable int id){
@@ -27,7 +29,7 @@ public class MatchController {
         return match;
     }
 
-    @PostMapping(value = "/message/{id}")
+    @PostMapping("/message/{id}")
     public ResponseEntity<String> writeMessage(@PathVariable int id, @RequestBody Message message){
         Match match =creator.getMatch(id);
         match.writeMessage(message);
@@ -43,6 +45,14 @@ public class MatchController {
             return new ResponseEntity<>(HttpStatus.OK);
         } return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
+    }
+
+    @PostMapping("end/{id}")
+    public ResponseEntity<String> endMatch(@PathVariable int id,Principal principal){
+        receiver.setStatus(principal,id);
+        if(receiver.didBothUsersSendQuery(id)){
+            return new ResponseEntity<>(HttpStatus.OK);
+        }else return new ResponseEntity<>(HttpStatus.ALREADY_REPORTED);
     }
 
 }

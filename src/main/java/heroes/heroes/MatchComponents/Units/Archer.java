@@ -1,7 +1,10 @@
 package heroes.heroes.MatchComponents.Units;
 
 import heroes.heroes.MatchComponents.Field;
+import heroes.heroes.MatchComponents.PathFinder.OnFootPathFinder;
+import heroes.heroes.MatchComponents.PathFinder.PathFinder;
 import heroes.heroes.User;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class Archer extends Unit {
 
@@ -14,8 +17,11 @@ public class Archer extends Unit {
         health = maxHealth;
         damage = 3;
         range = 5;
+        cost = 30;
+        pathFinder = new OnFootPathFinder();
     }
 
+    @Autowired
     public Archer(User owner){
         super(owner);
     }

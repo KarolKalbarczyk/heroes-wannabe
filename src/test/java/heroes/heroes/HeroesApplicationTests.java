@@ -1,12 +1,14 @@
 package heroes.heroes;
 
-import heroes.heroes.MatchComponents.Board;
-import heroes.heroes.MatchComponents.Field;
-import heroes.heroes.MatchComponents.Match;
-import heroes.heroes.MatchComponents.Move;
+import heroes.heroes.MatchComponents.*;
 import heroes.heroes.MatchComponents.Units.Archer;
 import heroes.heroes.MatchComponents.Units.Soldier;
+import heroes.heroes.MatchComponents.Units.Unit;
+import heroes.heroes.MatchMaking.MatchController;
+import heroes.heroes.MatchMaking.MatchCreator;
 import heroes.heroes.MatchMaking.SearchQueue;
+import heroes.heroes.MatchMaking.ShopPhaseController;
+import heroes.heroes.Repositories.UserRepository;
 import heroes.heroes.Security.UserPrinciple;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,10 +17,16 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.security.Principal;
+import java.util.Optional;
+import java.util.Set;
 
 import static org.mockito.Mockito.when;
 
@@ -37,6 +45,14 @@ public class HeroesApplicationTests {
 	User user2;
 	SearchQueue queue;
 	Match match;
+	@Autowired
+	MatchCreator creator;
+	@Autowired
+	ShopPhaseController shopPhaseController;
+	@Autowired
+	MatchController matchController;
+	@MockBean
+	UserRepository repository;
 
 	@Mock
 	Principal principal2;
@@ -81,8 +97,49 @@ public class HeroesApplicationTests {
 
 		queue.addUser(user1);
 		queue.addUser(user2);
-		match = new Match(queue);
+		//match = new Match(queue);
 	}
+
+	@Test
+	public void ShopPhaseTest(){
+		Optional<User> user = Optional.of(user1);
+		when(repository.findByUsername(principal.getName())).thenReturn(user);
+		int id = creator.startNewMatch(queue);
+		Assert.assertFalse("sold unit that weren't there",creator.sellUnit("archer",principal,id));
+		Assert.assertTrue("didn't buy unit but should",creator.buyUnit("archer",principal,id));
+		Assert.assertTrue("didn't buy unit but should",creator.buyUnit("archer",principal,id));
+		Assert.assertTrue("didn't buy unit but should",creator.buyUnit("soldier",principal,id));
+		Assert.assertTrue("didn't buy unit but should",creator.buyUnit("archer",principal,id));
+		Assert.assertTrue("couldn't sell unit",creator.sellUnit("soldier",principal,id));
+		WinConditioner conditioner = creator.getMatch(id).getWinCondition();
+		Set set = conditioner.getUnits().get(principal.getName());
+		Assert.assertFalse("deleted wrong unit",(checkContentsOfSet(set)));
+		Assert.assertTrue("didn't buy unit but should",creator.buyUnit("soldier",principal,id));
+		Assert.assertTrue("didn't buy unit but should",creator.buyUnit("soldier",principal,id));
+		Assert.assertFalse("bought unit without coins",creator.buyUnit("soldier",principal,id));
+	}
+
+	public boolean checkContentsOfSet(Set<Unit> set){
+		for (var unit:set){
+			if(unit.getClass().equals(Soldier.class)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Test
+	public void winnerTest(){
+		Move firstmove = new Move(new Field(0,0),new Field(1,1));
+		Assert.assertTrue("normal move",match.executeMove(firstmove, principal));
+		Move second = new Move(new Field(1,1),new Field(0,0));
+		Assert.assertTrue("normal move",match.executeMove(second, principal2));
+		Assert.assertTrue("normal move",match.executeMove(firstmove, principal));
+		Assert.assertTrue("normal move",match.executeMove(second, principal2));
+		Assert.assertTrue("winner not set",match.getWinner() !=null);
+	}
+
+
 
 	@Test
 	public void changeTurnAFterAttackTest(){
